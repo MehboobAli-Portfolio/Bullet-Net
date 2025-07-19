@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;     // Reference to Rigidbody component
     private Animator anim;    // Reference to Animator component
 
-    private bool isJumping = false; // Flag to check if player is jumping
+    private bool isJumping = true; // Flag to check if player is jumping
     void Start()
     {
         rb = GetComponent<Rigidbody>();    // Get Rigidbody component
@@ -25,15 +26,15 @@ public class PlayerMovement : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X");
 
         // Calculate movement vector (X: left/right, Z: forward/back)
-        Vector3 movement = new Vector3(-moveHorizontal, 0f, moveVertical);
+        Vector3 movement = new Vector3(moveHorizontal, 0f, moveVertical);
 
-        // Move the player using Rigidbody
-        rb.MovePosition(transform.position + movement * moveSpeed * Time.deltaTime);
+        // Move the player using Rigidbody (relative to facing direction)
+        rb.MovePosition(transform.position + transform.TransformDirection(movement) * moveSpeed * Time.deltaTime);
 
         // Rotate the player left/right based on mouse movement
-        if (movement != Vector3.zero && mouseX != 0f)
+        if ((moveHorizontal != 0f || moveVertical != 0f) &&mouseX != 0f)
         {
-            Vector3 rotateY = new Vector3(0f, -mouseX * rotateSpeed * Time.deltaTime, 0f);
+            Vector3 rotateY = new Vector3(0f, mouseX * rotateSpeed * Time.deltaTime, 0f);
             rb.MoveRotation(rb.rotation * Quaternion.Euler(rotateY));
         }
 
@@ -43,11 +44,17 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Update()
     {
-        // Handle jump input
-        if (Input.GetButtonDown("Jump") && Mathf.Abs(rb.linearVelocity.y) < 0.01f) // Check if player is grounded
+        if (Input.GetButtonDown("Jump") && isJumping)
         {
-            rb.AddForce(Vector3.up * 5.0f, ForceMode.Impulse);
+            isJumping = false;
+            rb.AddForce(Vector3.up * 6.0f, ForceMode.Impulse);
+            StartCoroutine(ResetJump());
         }
     }
 
+    private IEnumerator ResetJump()
+    {
+        yield return new WaitForSeconds(1f); // Simulated cooldown
+        isJumping = true;
+    }
 }
