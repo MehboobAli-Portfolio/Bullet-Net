@@ -25,16 +25,20 @@ public class changeWeapon : MonoBehaviour
     void Start()
     {
         camObject = GameObject.Find("PlayerCam");
-        aimTarget = GameObject.Find("AimReference").transform;
+        //aimTarget = GameObject.Find("AimReference").transform;
         if (this.gameObject.GetComponent<PhotonView>().IsMine == true)
         {
             cam = camObject.GetComponent<CinemachineCamera>();
             cam.Follow = this.gameObject.transform;
             cam.LookAt = this.gameObject.transform;
-            Invoke("SetLookAt", 0.1f);
+            //Invoke("SetLookAt", 0.1f);
+        }
+        else
+        {
+            this.gameObject.GetComponent<PlayerMovement>().enabled=false;
         }
     }
-    void SetLookAt()
+    /*void SetLookAt()
     {
         if (aimTarget != null)
         {
@@ -47,7 +51,7 @@ public class changeWeapon : MonoBehaviour
             }
             rig.Build();
         }
-    }
+    }*/
 
     // Update is called once per frame
     void Update()
