@@ -5,7 +5,7 @@ using System.Collections;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float moveSpeed = 3.5f;    // Player movement speed
+    public float moveSpeed = 10f;    // Player movement speed
     public float rotateSpeed = 100f;  // Player rotation speed
 
     private Rigidbody rb;     // Reference to Rigidbody component
@@ -47,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isJumping)
         {
             isJumping = false;
-            rb.AddForce(Vector3.up * 6.0f, ForceMode.Impulse);
+            rb.AddForce(Vector3.up * 600.0f, ForceMode.Impulse);
             StartCoroutine(ResetJump());
         }
     }

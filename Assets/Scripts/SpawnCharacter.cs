@@ -4,6 +4,9 @@ public class SpawnCharacter : MonoBehaviour
 {
     public GameObject character;
     public Transform[] spawnPoints;
+    public GameObject[] weapons;
+    public Transform[] weaponSpawnPoints;
+    private float weaponRespawnTime=10f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -17,5 +20,12 @@ public class SpawnCharacter : MonoBehaviour
     void Update()
     {
         
+    }
+    public void SpawnWeaponsStart()
+    {
+        for(int i=0;i<weapons.Length;i++)
+        {
+            PhotonNetwork.Instantiate(weapons[i].name,weaponSpawnPoints[i].position,weaponSpawnPoints[i].rotation);
+        }
     }
 }

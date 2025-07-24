@@ -21,6 +21,8 @@ public class changeWeapon : MonoBehaviour
     public Transform[] leftThumbTargetWeapons;
     public GameObject[] weapons;
     private int weaponNumber = 0;
+
+    private GameObject testForWeapons;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -36,6 +38,12 @@ public class changeWeapon : MonoBehaviour
         else
         {
             this.gameObject.GetComponent<PlayerMovement>().enabled=false;
+        }
+        testForWeapons=GameObject.Find("Weapon1PickUp(Clone)");
+        if(testForWeapons==null)
+        {
+            var spawner=GameObject.Find("SpawnScript");
+            spawner.GetComponent<SpawnCharacter>().SpawnWeaponsStart();
         }
     }
     /*void SetLookAt()
@@ -56,22 +64,27 @@ public class changeWeapon : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) && this.gameObject.GetComponent<PhotonView>().IsMine)
         {
-            weaponNumber++;
-            if (weaponNumber >= weapons.Length)
-            {
-                weaponNumber = 0;
-            }
-            for (int i = 0; i < weapons.Length; i++)
-            {
-                weapons[i].SetActive(false);
-            }
-            weapons[weaponNumber].SetActive(true);
-            leftHand.data.target = leftHandTargetWeapons[weaponNumber];
-            rightHand.data.target = rightHandTargetWeapons[weaponNumber];
-            leftThumb.data.target = leftThumbTargetWeapons[weaponNumber];
-            rig.Build();
+            this.GetComponent<PhotonView>().RPC("Change", RpcTarget.AllBuffered);
         }
+    }
+    [PunRPC]
+    public void Change()
+    {
+        weaponNumber++;
+        if (weaponNumber >= weapons.Length)
+        {
+            weaponNumber = 0;
+        }
+        for (int i = 0; i < weapons.Length; i++)
+        {
+            weapons[i].SetActive(false);
+        }
+        weapons[weaponNumber].SetActive(true);
+        leftHand.data.target = leftHandTargetWeapons[weaponNumber];
+        rightHand.data.target = rightHandTargetWeapons[weaponNumber];
+        leftThumb.data.target = leftThumbTargetWeapons[weaponNumber];
+        rig.Build();
     }
 }
