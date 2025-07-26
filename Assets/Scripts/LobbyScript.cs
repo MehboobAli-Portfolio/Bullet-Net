@@ -1,0 +1,57 @@
+using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+public class LobbyScript : MonoBehaviourPunCallbacks
+{
+    TypedLobby KillCount = new TypedLobby("Kill Count", LobbyType.Default);
+    TypedLobby teamBattle = new TypedLobby("Team Battle", LobbyType.Default);
+    TypedLobby noRespawn = new TypedLobby("No Respawn", LobbyType.Default);
+
+    public Text roomNumber;
+
+    private string levelName = "";
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void JoinKillCount()
+    {
+        levelName = "Floor layout";
+        PhotonNetwork.JoinLobby(KillCount);
+    }
+
+    public void JoinTeamBattle()
+    {
+        levelName = "Floor layout";
+        PhotonNetwork.JoinLobby(teamBattle);
+    }
+
+    public void JoinNoRespawn()
+    {
+        levelName = "Floor layout";
+        PhotonNetwork.JoinLobby(noRespawn);
+    }
+
+    public override void OnJoinedLobby()
+    {
+        PhotonNetwork.JoinRandomRoom();
+
+    }
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        Debug.Log("Joined Random Failed , Creating a new Room");
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = 6;
+        PhotonNetwork.CreateRoom("Arena" + Random.Range(1, 1000), roomOptions);
+    }
+    public override void OnJoinedRoom()
+    {
+        roomNumber.text =PhotonNetwork.CurrentRoom.Name;
+        Debug.Log("Joined Room");
+        PhotonNetwork.LoadLevel(levelName);
+    }
+}

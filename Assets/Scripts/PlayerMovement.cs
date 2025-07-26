@@ -47,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isJumping)
         {
             isJumping = false;
-            rb.AddForce(Vector3.up * 600.0f, ForceMode.Impulse);
+            rb.AddForce(Vector3.up * 12.0f, ForceMode.Impulse);
             StartCoroutine(ResetJump());
         }
     }
