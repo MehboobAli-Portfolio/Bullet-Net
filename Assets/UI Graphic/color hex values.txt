@@ -1,0 +1,8 @@
+Color hex values
+
+red: B41212
+green: 0B9311
+orange: D2730E
+blue: 13077E
+purple: 7D12B4
+grey: 483E3E

@@ -7,12 +7,13 @@ public class SpawnCharacter : MonoBehaviour
     public GameObject[] weapons;
     public Transform[] weaponSpawnPoints;
     private float weaponRespawnTime=10f;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         if(PhotonNetwork.IsConnected)
         {
-            PhotonNetwork.Instantiate(character.name,spawnPoints[PhotonNetwork.CountOfPlayers -1].position,spawnPoints[PhotonNetwork.CountOfPlayers -1].rotation);
+            PhotonNetwork.Instantiate(character.name,spawnPoints[PhotonNetwork.CurrentRoom.PlayerCount -1].position,spawnPoints[PhotonNetwork.CurrentRoom.PlayerCount -1].rotation);
         }
     }
 
