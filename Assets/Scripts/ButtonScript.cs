@@ -6,10 +6,16 @@ public class ButtonScript : MonoBehaviour
     private GameObject[] Players;
     private int myID;
     private GameObject panel;
+    private GameObject namesObject;
     private void Start()
     {
         Cursor.visible = true; // Show the cursor
         panel = GameObject.Find("ChoosePanel");
+        namesObject = GameObject.Find("NicknameBG"); // Ensure this GameObject exists in the scene
+        if (namesObject == null)    
+        {
+            Debug.LogError("NicknameBG GameObject not found in the scene.");
+        }
     }
 
     public void SelectButton(int buttonNumber)
@@ -52,6 +58,8 @@ public class ButtonScript : MonoBehaviour
             displayColor.viewID[buttonNumber] = myID;
             displayColor.ChooseColor();
         }
+        namesObject.GetComponent<Timer>().BeginTimer(); // Start the timer after color selection
+        // Hide the button after selection
         this.transform.gameObject.SetActive(false);
     }
 }
