@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using Unity.Cinemachine;
 using Photon.Pun;
+using UnityEngine.UI;
 public class changeWeapon : MonoBehaviour
 {
     public TwoBoneIKConstraint leftHand;
@@ -23,9 +24,17 @@ public class changeWeapon : MonoBehaviour
     private int weaponNumber = 0;
 
     private GameObject testForWeapons;
+
+    private Image WeaponIcon;
+    private Text ammoAmountText;
+    public Sprite[] weaponIcons;
+    public int[] ammoAmounts;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        WeaponIcon = GameObject.Find("WeaponUi").GetComponent<Image>();
+        ammoAmountText = GameObject.Find("AmmoAmount").GetComponent<Text>();
+
         camObject = GameObject.Find("PlayerCam");
         //aimTarget = GameObject.Find("AimReference").transform;
         if (this.gameObject.GetComponent<PhotonView>().IsMine == true)
@@ -67,15 +76,34 @@ public class changeWeapon : MonoBehaviour
         if (Input.GetMouseButtonDown(1) && this.gameObject.GetComponent<PhotonView>().IsMine)
         {
             this.GetComponent<PhotonView>().RPC("Change", RpcTarget.AllBuffered);
+            if (weaponNumber > weapons.Length - 1)
+            {
+                WeaponIcon.sprite = weaponIcons[0];
+                ammoAmountText.text = ammoAmounts[0].ToString();
+                weaponNumber = 0;
+            }
+            for (int i = 0; i < weapons.Length; i++)
+            {
+                weapons[i].SetActive(false);
+            }
+            weapons[weaponNumber].SetActive(true);
+            WeaponIcon.sprite = weaponIcons[weaponNumber];
+            ammoAmountText.text = ammoAmounts[weaponNumber].ToString();
+            leftHand.data.target = leftHandTargetWeapons[weaponNumber];
+            rightHand.data.target = rightHandTargetWeapons[weaponNumber];
+            leftThumb.data.target = leftThumbTargetWeapons[weaponNumber];
+            rig.Build();
+
         }
     }
     [PunRPC]
     public void Change()
     {
         weaponNumber++;
-        if (weaponNumber >= weapons.Length)
+        if (weaponNumber > weapons.Length - 1)
         {
             weaponNumber = 0;
+
         }
         for (int i = 0; i < weapons.Length; i++)
         {
