@@ -9,6 +9,7 @@ public class DisplayColor : MonoBehaviourPunCallbacks
     public Color32[] colors; // Array to hold colors corresponding to button numbers
     private GameObject nameObjects;
     private GameObject waitForPlayers;
+    public AudioClip[] gunshotSounds; // Array to hold gunshot sounds
     private void Start()
     {
         nameObjects = GameObject.Find("NicknameBG");
@@ -36,6 +37,22 @@ public class DisplayColor : MonoBehaviourPunCallbacks
     public void ChooseColor()
     {
         GetComponent<PhotonView>().RPC("AssignColors", RpcTarget.AllBuffered);
+    }
+    public void PalyGunshot(string name, int weaponNumber)
+    {
+        GetComponent<PhotonView>().RPC("PlaySound", RpcTarget.All, name, weaponNumber);
+    }
+    [PunRPC]
+    public void PlaySound(string name, int weaponNumber)
+    {
+        for (int i = 0; i < nameObjects.GetComponent<NickNameScript>().name.Length; i++)
+        {
+            if (nameObjects.GetComponent<NickNameScript>().name[i].text == name)
+            {
+                GetComponent<AudioSource>().clip = gunshotSounds[weaponNumber];
+                GetComponent<AudioSource>().Play();
+            }
+        }
     }
     [PunRPC]
     public void AssignColors()

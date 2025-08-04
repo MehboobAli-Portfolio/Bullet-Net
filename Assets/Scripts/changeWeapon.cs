@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using Unity.Cinemachine;
@@ -29,6 +30,8 @@ public class changeWeapon : MonoBehaviour
     private Text ammoAmountText;
     public Sprite[] weaponIcons;
     public int[] ammoAmounts;
+
+    public GameObject[] muzzleFlash;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -46,12 +49,12 @@ public class changeWeapon : MonoBehaviour
         }
         else
         {
-            this.gameObject.GetComponent<PlayerMovement>().enabled=false;
+            this.gameObject.GetComponent<PlayerMovement>().enabled = false;
         }
-        testForWeapons=GameObject.Find("Weapon1PickUp(Clone)");
-        if(testForWeapons==null)
+        testForWeapons = GameObject.Find("Weapon1PickUp(Clone)");
+        if (testForWeapons == null)
         {
-            var spawner=GameObject.Find("SpawnScript");
+            var spawner = GameObject.Find("SpawnScript");
             spawner.GetComponent<SpawnCharacter>().SpawnWeaponsStart();
         }
     }
@@ -73,6 +76,16 @@ public class changeWeapon : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetMouseButtonDown(0) && this.gameObject.GetComponent<PhotonView>().IsMine)
+        {
+            if (muzzleFlash[weaponNumber] != null)
+            {
+                GetComponent<DisplayColor>().PalyGunshot(this.GetComponent<PhotonView>().Owner.NickName, weaponNumber);
+                this.GetComponent<PhotonView>().RPC("GunMuzzleFlash", RpcTarget.All);
+                //muzzleFlash[weaponNumber].SetActive(true);
+                //StartCoroutine(MuzzleOff());
+            }
+        }
         if (Input.GetMouseButtonDown(1) && this.gameObject.GetComponent<PhotonView>().IsMine)
         {
             this.GetComponent<PhotonView>().RPC("Change", RpcTarget.AllBuffered);
@@ -97,6 +110,12 @@ public class changeWeapon : MonoBehaviour
         }
     }
     [PunRPC]
+    public void GunMuzzleFlash()
+    {
+        muzzleFlash[weaponNumber].SetActive(true);
+        StartCoroutine(MuzzleOff());
+    }
+    [PunRPC]
     public void Change()
     {
         weaponNumber++;
@@ -114,5 +133,18 @@ public class changeWeapon : MonoBehaviour
         rightHand.data.target = rightHandTargetWeapons[weaponNumber];
         leftThumb.data.target = leftThumbTargetWeapons[weaponNumber];
         rig.Build();
+    }
+    IEnumerator MuzzleOff()
+    {
+        yield return new WaitForSeconds(0.03f);
+        this.GetComponent<PhotonView>().RPC("MuzzleOffRPC", RpcTarget.All);
+    }
+    [PunRPC]
+    public void MuzzleOffRPC()
+    {
+        if (muzzleFlash[weaponNumber] != null)
+        {
+            muzzleFlash[weaponNumber].SetActive(false);
+        }
     }
 }
