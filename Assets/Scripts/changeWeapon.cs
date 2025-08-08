@@ -32,6 +32,9 @@ public class changeWeapon : MonoBehaviour
     public int[] ammoAmounts;
 
     public GameObject[] muzzleFlash;
+    private string shooterName;
+    private string gotShotName;
+    public float[] damageAmts;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -82,6 +85,21 @@ public class changeWeapon : MonoBehaviour
             {
                 GetComponent<DisplayColor>().PalyGunshot(this.GetComponent<PhotonView>().Owner.NickName, weaponNumber);
                 this.GetComponent<PhotonView>().RPC("GunMuzzleFlash", RpcTarget.All);
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                this.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                if (Physics.Raycast(ray, out hit, 500f))
+                {
+                    if (hit.transform.gameObject.GetComponent<PhotonView>() != null)
+                    {
+                        gotShotName = hit.transform.gameObject.GetComponent<PhotonView>().Owner.NickName;
+                        GetComponent<DisplayColor>().DeliverDamage(gotShotName, damageAmts[weaponNumber]);
+                    }
+                    shooterName = GetComponent<PhotonView>().Owner.NickName;
+                    Debug.Log("Hit: " + hit.transform.name + " by: " + shooterName + " on: " + gotShotName);
+                }
+                this.gameObject.layer = LayerMask.NameToLayer("Default");
+                
                 //muzzleFlash[weaponNumber].SetActive(true);
                 //StartCoroutine(MuzzleOff());
             }
