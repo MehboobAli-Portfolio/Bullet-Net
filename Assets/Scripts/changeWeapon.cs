@@ -35,6 +35,9 @@ public class changeWeapon : MonoBehaviour
     private string shooterName;
     private string gotShotName;
     public float[] damageAmts;
+    public bool isDeath=false;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -57,8 +60,11 @@ public class changeWeapon : MonoBehaviour
         testForWeapons = GameObject.Find("Weapon1PickUp(Clone)");
         if (testForWeapons == null)
         {
-            var spawner = GameObject.Find("SpawnScript");
-            spawner.GetComponent<SpawnCharacter>().SpawnWeaponsStart();
+            if(this.gameObject.GetComponent<PhotonView>().Owner.IsMasterClient)
+            {
+                var spawner = GameObject.Find("SpawnScript");
+                spawner.GetComponent<SpawnCharacter>().SpawnWeaponsStart();
+            }
         }
     }
     /*void SetLookAt()
@@ -79,53 +85,60 @@ public class changeWeapon : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && this.gameObject.GetComponent<PhotonView>().IsMine)
+        if (!isDeath)
         {
-            if (muzzleFlash[weaponNumber] != null)
+            if (Input.GetMouseButtonDown(0) && this.gameObject.GetComponent<PhotonView>().IsMine)
             {
-                GetComponent<DisplayColor>().PalyGunshot(this.GetComponent<PhotonView>().Owner.NickName, weaponNumber);
-                this.GetComponent<PhotonView>().RPC("GunMuzzleFlash", RpcTarget.All);
-                RaycastHit hit;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                this.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-                if (Physics.Raycast(ray, out hit, 500f))
+                if (muzzleFlash[weaponNumber] != null)
                 {
-                    if (hit.transform.gameObject.GetComponent<PhotonView>() != null)
-                    {
-                        gotShotName = hit.transform.gameObject.GetComponent<PhotonView>().Owner.NickName;
-                        GetComponent<DisplayColor>().DeliverDamage(gotShotName, damageAmts[weaponNumber]);
+                    GetComponent<DisplayColor>().PalyGunshot(this.GetComponent<PhotonView>().Owner.NickName, weaponNumber);
+                    this.GetComponent<PhotonView>().RPC("GunMuzzleFlash", RpcTarget.All);
+                    RaycastHit hit;
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    this.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                     if (Physics.Raycast(ray, out hit, 500))
+                     {
+                         if (hit.transform.gameObject.GetComponent<PhotonView>() != null)
+                         {
+                             gotShotName = hit.transform.gameObject.GetComponent<PhotonView>().Owner.NickName;
+                         }
+                        if (hit.transform.gameObject.GetComponent<DisplayColor>() != null)
+                        {
+                            hit.transform.gameObject.GetComponent<DisplayColor>().DeliverDamage(this.GetComponent<PhotonView>().Owner.NickName, hit.transform.gameObject.GetComponent<PhotonView>().Owner.NickName, damageAmts[weaponNumber]);
+                        }
+                        shooterName = GetComponent<PhotonView>().Owner.NickName;
+                        Debug.Log(gotShotName + " got hit by " + shooterName);
                     }
-                    shooterName = GetComponent<PhotonView>().Owner.NickName;
-                    Debug.Log("Hit: " + hit.transform.name + " by: " + shooterName + " on: " + gotShotName);
-                }
-                this.gameObject.layer = LayerMask.NameToLayer("Default");
-                
-                //muzzleFlash[weaponNumber].SetActive(true);
-                //StartCoroutine(MuzzleOff());
-            }
-        }
-        if (Input.GetMouseButtonDown(1) && this.gameObject.GetComponent<PhotonView>().IsMine)
-        {
-            this.GetComponent<PhotonView>().RPC("Change", RpcTarget.AllBuffered);
-            if (weaponNumber > weapons.Length - 1)
-            {
-                WeaponIcon.sprite = weaponIcons[0];
-                ammoAmountText.text = ammoAmounts[0].ToString();
-                weaponNumber = 0;
-            }
-            for (int i = 0; i < weapons.Length; i++)
-            {
-                weapons[i].SetActive(false);
-            }
-            weapons[weaponNumber].SetActive(true);
-            WeaponIcon.sprite = weaponIcons[weaponNumber];
-            ammoAmountText.text = ammoAmounts[weaponNumber].ToString();
-            leftHand.data.target = leftHandTargetWeapons[weaponNumber];
-            rightHand.data.target = rightHandTargetWeapons[weaponNumber];
-            leftThumb.data.target = leftThumbTargetWeapons[weaponNumber];
-            rig.Build();
+                    this.gameObject.layer = LayerMask.NameToLayer("Default");
 
+                    //muzzleFlash[weaponNumber].SetActive(true);
+                    //StartCoroutine(MuzzleOff());
+                }
+            }
+            if (Input.GetMouseButtonDown(1) && this.gameObject.GetComponent<PhotonView>().IsMine)
+            {
+                this.GetComponent<PhotonView>().RPC("Change", RpcTarget.AllBuffered);
+                if (weaponNumber > weapons.Length - 1)
+                {
+                    WeaponIcon.sprite = weaponIcons[0];
+                    ammoAmountText.text = ammoAmounts[0].ToString();
+                    weaponNumber = 0;
+                }
+                for (int i = 0; i < weapons.Length; i++)
+                {
+                    weapons[i].SetActive(false);
+                }
+                weapons[weaponNumber].SetActive(true);
+                WeaponIcon.sprite = weaponIcons[weaponNumber];
+                ammoAmountText.text = ammoAmounts[weaponNumber].ToString();
+                leftHand.data.target = leftHandTargetWeapons[weaponNumber];
+                rightHand.data.target = rightHandTargetWeapons[weaponNumber];
+                leftThumb.data.target = leftThumbTargetWeapons[weaponNumber];
+                rig.Build();
+
+            }
         }
+        
     }
     [PunRPC]
     public void GunMuzzleFlash()

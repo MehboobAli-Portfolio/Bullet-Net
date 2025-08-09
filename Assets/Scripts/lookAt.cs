@@ -10,7 +10,7 @@ public class lookAt : MonoBehaviour
     {
         screenPosition = Input.mousePosition;
         // Set a fixed distance from the camera (e.g., 3 units)
-        screenPosition.z = 3f;
+        screenPosition.z = 6f;
         worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
 
         // Move only on XZ plane, keep current Y
