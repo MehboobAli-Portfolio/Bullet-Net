@@ -148,7 +148,7 @@ Bullet Net is released under the MIT License. See the [LICENSE](LICENSE) file fo
 - **Author:** Mehboob Ali
 - **Photon ID:** 45840806-b502-4ea9-a8c9-f5c1e812a6e7
 - **GitHub:** [MehboobAli-Portfolio](https://github.com/MehboobAli-Portfolio)
-- **Email:** [YourEmail@example.com](mailto:YourEmail@example.com)
+- **Email:** mehboob56ali78@gmail.com
 
 ---
 
