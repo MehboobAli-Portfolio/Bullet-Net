@@ -1,6 +1,6 @@
-
 using UnityEngine;
 using System.Collections;
+using Photon.Pun;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -11,18 +11,27 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;     // Reference to Rigidbody component
     private Animator anim;    // Reference to Animator component
 
+
     private bool isJumping = true; // Flag to check if player is jumping
     public bool isDeath = false;
+    private Vector3 startPos;
+    private bool respawned = false;
+    private GameObject respawnPanel;
+    public bool gameOver = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();    // Get Rigidbody component
         anim = GetComponent<Animator>();   // Get Animator component
+        startPos = transform.position;     // Save the starting position
+        respawnPanel = GameObject.Find("RespawnPanel");
     }
 
     void FixedUpdate()
     {
         if (!isDeath)
         {
+            respawnPanel.SetActive(false);
             // Get movement and mouse input
             float moveHorizontal = Input.GetAxis("Horizontal");
             float moveVertical = Input.GetAxis("Vertical");
@@ -57,6 +66,13 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(ResetJump());
             }
         }
+        if (isDeath && !respawned && !gameOver)
+        {
+            respawned = true;
+            respawnPanel.SetActive(true);
+            respawnPanel.GetComponent<RespawnTimer>().enabled = true;
+            StartCoroutine(RespawnWait());
+        }
     }
 
 
@@ -64,5 +80,13 @@ public class PlayerMovement : MonoBehaviour
     {
         yield return new WaitForSeconds(1f); // Simulated cooldown
         isJumping = true;
+    }
+    private IEnumerator RespawnWait()
+    {
+        yield return new WaitForSeconds(3f); // Wait before respawning
+        isDeath = false; // Reset death state
+        respawned = false; // Allow respawning again
+        transform.position = startPos; // Reset position to start
+        GetComponent<DisplayColor>().Respawn(GetComponent<PhotonView>().Owner.NickName);
     }
 }

@@ -6,6 +6,7 @@ public class WeaponPickup : MonoBehaviour
     private AudioSource audioPlayer;
     public float respawnTime = 5f;
     public int weaponType = 1;
+    public int ammoRefilledAmt = 60;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -17,6 +18,8 @@ public class WeaponPickup : MonoBehaviour
         {
             this.GetComponent<PhotonView>().RPC("PlayPickupAudio", RpcTarget.All);
             this.GetComponent<PhotonView>().RPC("TurnOff", RpcTarget.All);
+            other.GetComponent<changeWeapon>().ammoAmounts[weaponType - 1] += ammoRefilledAmt;
+            other.GetComponent<changeWeapon>().UpdatePickup();
         }
     }
     [PunRPC]

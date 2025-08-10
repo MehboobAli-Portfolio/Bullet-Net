@@ -14,6 +14,7 @@ public class DisplayColor : MonoBehaviourPunCallbacks
     {
         nameObjects = GameObject.Find("NicknameBG");
         waitForPlayers = GameObject.Find("WaitingBG");
+        InvokeRepeating("CheckTime", 1f, 1f);
     }
     private void Update()
     {
@@ -30,7 +31,37 @@ public class DisplayColor : MonoBehaviourPunCallbacks
             StartCoroutine(HitEffect());
         }
     }
-    public void DeliverDamage(string shooterName,string name, float damageAmts)
+    private void CheckTime()
+    {
+    if (nameObjects.GetComponent<Timer>().timeStop == true)
+        {
+            this.gameObject.GetComponent<PlayerMovement>().isDeath = true;
+            this.gameObject.GetComponent<PlayerMovement>().gameOver = true;
+            this.gameObject.GetComponent<changeWeapon>().isDeath = true;
+            this.gameObject.GetComponentInChildren<AimLookAtRef>().isDeath = true;
+            this.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+        }
+    }
+    public void Respawn(string name)
+    {
+        GetComponent<PhotonView>().RPC("RespawnPlayer", RpcTarget.AllBuffered, name);
+    }
+    [PunRPC]
+    public void RespawnPlayer(string name)
+    {
+        for (int i = 0; i < nameObjects.GetComponent<NickNameScript>().name.Length; i++)
+        {
+            if (nameObjects.GetComponent<NickNameScript>().name[i].text == name)
+            {
+                this.GetComponent<Animator>().SetBool("Death", false);
+                this.gameObject.GetComponent<changeWeapon>().isDeath = false;
+                this.gameObject.GetComponentInChildren<AimLookAtRef>().isDeath = false;
+                this.gameObject.layer = LayerMask.NameToLayer("Default");  
+                nameObjects.GetComponent<NickNameScript>().healthBar[i].gameObject.GetComponent<Image>().fillAmount = 1f;            
+            }
+        }
+    }
+    public void DeliverDamage(string shooterName, string name, float damageAmts)
     {
         GetComponent<PhotonView>().RPC("GunDamage", RpcTarget.All, shooterName, name, damageAmts);
     }
