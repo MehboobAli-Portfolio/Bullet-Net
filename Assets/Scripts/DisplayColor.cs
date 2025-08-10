@@ -7,14 +7,20 @@ public class DisplayColor : MonoBehaviourPunCallbacks
     public int[] buttonNumbers; // Array to hold button numbers
     public int[] viewID;
     public Color32[] colors; // Array to hold colors corresponding to button numbers
+    public Color32[] teamColors;
+    private bool teamMode = false;
     private GameObject nameObjects;
     private GameObject waitForPlayers;
     public AudioClip[] gunshotSounds; // Array to hold gunshot sounds
+    private bool isRespawning = false;
     private void Start()
     {
         nameObjects = GameObject.Find("NicknameBG");
         waitForPlayers = GameObject.Find("WaitingBG");
         InvokeRepeating("CheckTime", 1f, 1f);
+        teamMode = nameObjects.GetComponent<NickNameScript>().teamMode;
+        isRespawning = nameObjects.GetComponent<NickNameScript>().noRespawn;
+        GetComponent<PlayerMovement>().noRespawn = isRespawning;
     }
     private void Update()
     {
@@ -26,14 +32,20 @@ public class DisplayColor : MonoBehaviourPunCallbacks
                 RoomExit();
             }
         }
-    if (this.GetComponent<Animator>().GetBool("Hit"))
+        if (this.GetComponent<Animator>().GetBool("Hit"))
         {
             StartCoroutine(HitEffect());
         }
     }
+    public void NoRespawnExit()
+    {
+        nameObjects.GetComponent<NickNameScript>().eliminationPanel.SetActive(true);
+        StartCoroutine(WaitTOExit());
+    }
+
     private void CheckTime()
     {
-    if (nameObjects.GetComponent<Timer>().timeStop == true)
+        if (nameObjects.GetComponent<Timer>().timeStop == true)
         {
             this.gameObject.GetComponent<PlayerMovement>().isDeath = true;
             this.gameObject.GetComponent<PlayerMovement>().gameOver = true;
@@ -56,8 +68,8 @@ public class DisplayColor : MonoBehaviourPunCallbacks
                 this.GetComponent<Animator>().SetBool("Death", false);
                 this.gameObject.GetComponent<changeWeapon>().isDeath = false;
                 this.gameObject.GetComponentInChildren<AimLookAtRef>().isDeath = false;
-                this.gameObject.layer = LayerMask.NameToLayer("Default");  
-                nameObjects.GetComponent<NickNameScript>().healthBar[i].gameObject.GetComponent<Image>().fillAmount = 1f;            
+                this.gameObject.layer = LayerMask.NameToLayer("Default");
+                nameObjects.GetComponent<NickNameScript>().healthBar[i].gameObject.GetComponent<Image>().fillAmount = 1f;
             }
         }
     }
@@ -123,12 +135,25 @@ public class DisplayColor : MonoBehaviourPunCallbacks
     {
         for (int i = 0; i < viewID.Length; i++)
         {
-            if (this.GetComponent<PhotonView>().ViewID == viewID[i])
+            if (!teamMode)
             {
-                this.transform.GetChild(1).GetComponent<Renderer>().material.color = colors[i];
-                nameObjects.GetComponent<NickNameScript>().name[i].gameObject.SetActive(true);
-                nameObjects.GetComponent<NickNameScript>().healthBar[i].gameObject.SetActive(true);
-                nameObjects.GetComponent<NickNameScript>().name[i].text = this.GetComponent<PhotonView>().Owner.NickName;
+                if (this.GetComponent<PhotonView>().ViewID == viewID[i])
+                {
+                    this.transform.GetChild(1).GetComponent<Renderer>().material.color = colors[i];
+                    nameObjects.GetComponent<NickNameScript>().name[i].gameObject.SetActive(true);
+                    nameObjects.GetComponent<NickNameScript>().healthBar[i].gameObject.SetActive(true);
+                    nameObjects.GetComponent<NickNameScript>().name[i].text = this.GetComponent<PhotonView>().Owner.NickName;
+                }
+            }
+            else if (teamMode)
+            {
+                if (this.GetComponent<PhotonView>().ViewID == viewID[i])
+                {
+                    this.transform.GetChild(1).GetComponent<Renderer>().material.color = teamColors[i];
+                    nameObjects.GetComponent<NickNameScript>().name[i].gameObject.SetActive(true);
+                    nameObjects.GetComponent<NickNameScript>().healthBar[i].gameObject.SetActive(true);
+                    nameObjects.GetComponent<NickNameScript>().name[i].text = this.GetComponent<PhotonView>().Owner.NickName;
+                }
             }
         }
     }
@@ -155,5 +180,11 @@ public class DisplayColor : MonoBehaviourPunCallbacks
     {
         yield return new WaitForSeconds(0.03f);
         this.GetComponent<Animator>().SetBool("Hit", false);
+    }
+    IEnumerator WaitTOExit()
+    {
+        yield return new WaitForSeconds(3f);
+        RemoveMe();
+        RoomExit();
     }
 }

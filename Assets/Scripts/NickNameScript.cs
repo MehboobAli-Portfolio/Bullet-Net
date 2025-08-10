@@ -11,8 +11,15 @@ public class NickNameScript : MonoBehaviourPunCallbacks
     public GameObject displayPanel;
     public Text message;
     public int[] kills;
+    public bool noRespawn = false;
+    public bool teamMode = false;
+    public GameObject eliminationPanel;
     private void Start()
     {
+        if(noRespawn)
+        {
+            eliminationPanel.SetActive(false);
+        }
         displayPanel.SetActive(false);
         for (int i = 0; i < name.Length; i++)
         {

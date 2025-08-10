@@ -1324,6 +1324,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 10
   rotateSpeed: 100
+  isDeath: 0
+  gameOver: 0
 --- !u!114 &4513613879275776670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3068,6 +3070,7 @@ MonoBehaviour:
   - 0.1
   - 0.3
   - 0.5
+  isDeath: 0
 --- !u!114 &3167477708110301603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3202,6 +3205,19 @@ MonoBehaviour:
     rgba: 4289991293
   - serializedVersion: 2
     rgba: 4282269256
+  teamColors:
+  - serializedVersion: 2
+    rgba: 4279374516
+  - serializedVersion: 2
+    rgba: 4279374516
+  - serializedVersion: 2
+    rgba: 4279374516
+  - serializedVersion: 2
+    rgba: 4279341835
+  - serializedVersion: 2
+    rgba: 4279341835
+  - serializedVersion: 2
+    rgba: 4279341835
   gunshotSounds:
   - {fileID: 8300000, guid: 93fba0b1bf5014543918fa775911b6a3, type: 3}
   - {fileID: 8300000, guid: 733a0ff7727334749a0381b7092162b3, type: 3}
@@ -15121,6 +15137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdd9fdff7e29f8e44802509619468978, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDeath: 0
 --- !u!1 &8794573207472830567
 GameObject:
   m_ObjectHideFlags: 0

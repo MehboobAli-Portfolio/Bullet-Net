@@ -1,10 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-public class KillCount : MonoBehaviour
+public class TeamKillCount : MonoBehaviour
 {
     public List<Kills> highestKills = new List<Kills>();
-    public Text[] names;
     public Text[] killAmount;
     private GameObject killCountPanel;
     private GameObject namesObject;
@@ -12,6 +11,8 @@ public class KillCount : MonoBehaviour
     public bool countDown = true;
     public GameObject WinnerPanel;
     public Text winnerText;
+    private int RedTeamKills;
+    private int GreenTeamKills;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -31,27 +32,14 @@ public class KillCount : MonoBehaviour
                 killCountPanel.SetActive(true);
                 killCountPanelActive = true;
                 highestKills.Clear();
-                for (int i = 0; i < names.Length; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     highestKills.Add(new Kills(namesObject.GetComponent<NickNameScript>().name[i].text, namesObject.GetComponent<NickNameScript>().kills[i])); // Store player names and kills
                 }
-                highestKills.Sort();
-                for (int i = 0; i < names.Length; i++)
-                {
-                    if (i < highestKills.Count)
-                    {
-                        names[i].text = highestKills[i].playerName;
-                        killAmount[i].text = highestKills[i].playerKills.ToString();
-                    }
-                }
-                for (int i = 0; i < names.Length; i++)
-                {
-                    if (names[i].text == "Name")
-                    {
-                        names[i].text = "";
-                        killAmount[i].text = "";
-                    }
-                }
+                RedTeamKills = highestKills[0].playerKills + highestKills[1].playerKills + highestKills[2].playerKills;
+                GreenTeamKills = highestKills[3].playerKills + highestKills[4].playerKills + highestKills[5].playerKills;
+                killAmount[0].text = RedTeamKills.ToString();
+                killAmount[1].text = GreenTeamKills.ToString();
             }
             else if (killCountPanelActive)
             {
@@ -66,33 +54,25 @@ public class KillCount : MonoBehaviour
         WinnerPanel.SetActive(true);
         killCountPanelActive = true;
         highestKills.Clear();
-        for (int i = 0; i < names.Length; i++)
+        for (int i = 0; i < 6; i++)
         {
             highestKills.Add(new Kills(namesObject.GetComponent<NickNameScript>().name[i].text, namesObject.GetComponent<NickNameScript>().kills[i])); // Store player names and kills
         }
-        highestKills.Sort();
-        winnerText.text = highestKills[0].playerName;
-        for (int i = 0; i < names.Length; i++)
+        RedTeamKills = highestKills[0].playerKills + highestKills[1].playerKills + highestKills[2].playerKills;
+        GreenTeamKills = highestKills[3].playerKills + highestKills[4].playerKills + highestKills[5].playerKills;
+        killAmount[0].text = RedTeamKills.ToString();
+        killAmount[1].text = GreenTeamKills.ToString();
+        if (RedTeamKills > GreenTeamKills)
         {
-            if (i < highestKills.Count)
-            {
-                names[i].text = highestKills[i].playerName;
-                killAmount[i].text = highestKills[i].playerKills.ToString();
-            }
+            winnerText.text = "Red Team Wins!";
         }
-        for (int i = 0; i < names.Length; i++)
+        else if (GreenTeamKills > RedTeamKills)
         {
-            if (names[i].text == "Name")
-            {
-                names[i].text = "";
-                killAmount[i].text = "";
-            }
+            winnerText.text = "Green Team Wins!";
         }
-
-    }
-    public void NoRespawnWinner(string name)
-    {
-        WinnerPanel.SetActive(true);
-        winnerText.text = name;
+        else
+        {
+            winnerText.text = "It's a Tie!";
+        }
     }
 }

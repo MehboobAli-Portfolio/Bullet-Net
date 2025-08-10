@@ -18,7 +18,14 @@ public class PlayerMovement : MonoBehaviour
     private bool respawned = false;
     private GameObject respawnPanel;
     public bool gameOver = false;
-
+    public bool noRespawn;
+    private bool startChecking = false;
+    private GameObject Canvas;
+    private void Awake()
+    {
+        respawnPanel = GameObject.Find("RespawnPanel");
+        Canvas = GameObject.Find("Canvas");
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();    // Get Rigidbody component
@@ -66,15 +73,31 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(ResetJump());
             }
         }
-        if (isDeath && !respawned && !gameOver)
+        if (isDeath && !respawned && !gameOver && !noRespawn)
         {
             respawned = true;
             respawnPanel.SetActive(true);
             respawnPanel.GetComponent<RespawnTimer>().enabled = true;
             StartCoroutine(RespawnWait());
         }
+        if (isDeath && !respawned && !gameOver && noRespawn)
+        {
+            respawned = true;
+            GetComponent<DisplayColor>().NoRespawnExit();
+        }
+        if(PhotonNetwork.CurrentRoom.PlayerCount > 1 && !startChecking)
+        {
+            startChecking = true;
+            InvokeRepeating("CheckForwinner", 3f, 3f);
+        }
     }
-
+    void CheckForwinner()
+    {
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
+        {
+            Canvas.GetComponent<KillCount>().NoRespawnWinner(PhotonNetwork.LocalPlayer.NickName);
+        }
+    }
 
     private IEnumerator ResetJump()
     {

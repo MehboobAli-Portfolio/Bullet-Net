@@ -27,31 +27,50 @@ public class Timer : MonoBehaviour
     }
     private void TimeCountDown()
     {
-        if (seconds > 10)
+        if (!this.gameObject.GetComponent<NickNameScript>().noRespawn)
         {
-            seconds -= 1;
-            secondsText.text = seconds.ToString();
+            if (seconds > 10)
+            {
+                seconds -= 1;
+                secondsText.text = seconds.ToString();
+            }
+            else if (seconds > 0 && seconds < 11)
+            {
+                seconds -= 1;
+                secondsText.text = "0" + seconds.ToString();
+            }
+            else if (seconds == 0 && minutes > 0)
+            {
+                secondsText.text = "0" + seconds.ToString();
+                minutes -= 1;
+                seconds = 59;
+                minutesText.text = minutes.ToString();
+                secondsText.text = seconds.ToString();
+            }
+            else if (seconds == 0 && minutes <= 0)
+            {
+                if (this.gameObject.GetComponent<NickNameScript>().teamMode == false)
+                {
+                    secondsText.text = "00";
+                    minutesText.text = "00";
+                    timeStop = true;
+                    Canvas.GetComponent<KillCount>().countDown = false;
+                    Canvas.GetComponent<KillCount>().TimeOver();
+                }
+                else if (this.gameObject.GetComponent<NickNameScript>().teamMode == true)
+                {
+                    secondsText.text = "00";
+                    minutesText.text = "00";
+                    timeStop = true;
+                    Canvas.GetComponent<TeamKillCount>().countDown = false;
+                    Canvas.GetComponent<TeamKillCount>().TimeOver();
+                }
+            }
         }
-        else if (seconds > 0 && seconds < 11)
+        else
         {
-            seconds -= 1;
-            secondsText.text = "0" + seconds.ToString();
-        }
-        else if (seconds == 0 && minutes > 0)
-        {
-            secondsText.text = "0" + seconds.ToString();
-            minutes -= 1;
-            seconds = 59;
-            minutesText.text = minutes.ToString();
-            secondsText.text = seconds.ToString();
-        }
-        else if (seconds == 0 && minutes <= 0)
-        {
-            secondsText.text = "00";
-            minutesText.text = "00";
-            timeStop = true;
-            Canvas.GetComponent<KillCount>().countDown = false;
-            Canvas.GetComponent<KillCount>().TimeOver();
+            minutesText.text = "";
+            secondsText.text = "";
         }
 
     }
