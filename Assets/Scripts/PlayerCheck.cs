@@ -3,7 +3,7 @@ using Photon.Pun;
 using UnityEngine.UI;
 public class PlayerCheck : MonoBehaviour
 {
-    public int maxPlayerInRoom = 6;
+    public int maxPlayerInRoom = 4;
     public Text currentPlayer;
     public GameObject hint1, hint2;
     public GameObject enterButton;

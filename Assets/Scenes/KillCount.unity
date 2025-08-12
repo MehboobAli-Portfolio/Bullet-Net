@@ -127239,7 +127239,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 3/6
+  m_Text: 2/4
 --- !u!222 &942449724
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -215062,6 +215062,9 @@ MonoBehaviour:
   displayPanel: {fileID: 1258656953}
   message: {fileID: 1121404354}
   kills: 000000000000000000000000000000000000000000000000
+  noRespawn: 0
+  teamMode: 0
+  eliminationPanel: {fileID: 0}
 --- !u!114 &1591454075
 MonoBehaviour:
   m_ObjectHideFlags: 0
